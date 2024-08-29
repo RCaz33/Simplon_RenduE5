@@ -2,24 +2,34 @@ from flask import Flask, render_template, request
 import plotly.graph_objs as go
 import plotly.express as px
 import numpy as np
-print("first import")
 
 from keras.models import load_model
-print("keras imported")
 
 import logging
 import flask_monitoringdashboard as dashboard
-print("monitor dashboard imported")
+
 from src.get_data import GetData
 from src.utils import create_figure, prediction_from_model 
+
+import logging
+logging.basicConfig(
+    filename='app_debug.log',  # Log messages will be saved in this file
+    level=logging.ERROR, # Set the logging level to ERROR
+    format='%(asctime)s - %(levelname)s - %(message)s', # Log message format
+    datefmt='%Y-%m-%d %H:%M:%S' # Date format for log entries
+)
 
 app = Flask(__name__)
 
 
+try:
+    data_retriever = GetData(url="https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/etat-du-trafic-en-temps-reel/exports/json?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B")
+    data = data_retriever()
+except Exception as E:
+    print(E)
+    logging.error("An unexpected error occurred", exc_info=True)
 
-data_retriever = GetData(url="https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/etat-du-trafic-en-temps-reel/exports/json?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B")
-data = data_retriever()
-print(data)
+
 model = load_model('model.h5') 
 
 @app.route('/', methods=['GET', 'POST'])
