@@ -1,0 +1,9 @@
+# python==3.11.0
+flask
+numpy
+pandas
+keras
+plotly
+requests
+tensorflow-cpu
+# pillow
